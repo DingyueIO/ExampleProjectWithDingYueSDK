@@ -1,0 +1,6 @@
+framework module Pods_DYObjectiveCApp {
+  umbrella header "Pods-DYObjectiveCApp-umbrella.h"
+
+  export *
+  module * { export * }
+}

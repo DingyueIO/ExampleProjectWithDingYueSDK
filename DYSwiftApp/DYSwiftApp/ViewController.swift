@@ -34,8 +34,6 @@ class ViewController: UIViewController{
         DYMobileSDK.showVisualPaywall(products: [product,product2], rootController: self) { receipt, purchaseResult, error in
             if error == nil {
                 print("(DingYueSDK): 购买成功！")
-                print("(DingYueSDK): 购买收据：\(receipt)")
-                print("(DingYueSDK): 产品信息：\(purchaseResult)")
             }
         }
     }

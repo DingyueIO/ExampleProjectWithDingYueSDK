@@ -66,12 +66,12 @@
 			isa = PBXGroup;
 			children = (
 				47FF2CFB28755C8C00437080 /* AppDelegate.swift */,
-				4760B41B287BB37300C79080 /* DingYue.plist */,
 				4731FD82287EDAE80070F426 /* LBWebViewController.swift */,
 				47FF2CFF28755C8C00437080 /* ViewController.swift */,
 				47FF2D0128755C8C00437080 /* Main.storyboard */,
 				47FF2D0428755C8D00437080 /* Assets.xcassets */,
 				47FF2D0628755C8D00437080 /* LaunchScreen.storyboard */,
+				4760B41B287BB37300C79080 /* DingYue.plist */,
 				47FF2D0928755C8D00437080 /* Info.plist */,
 			);
 			path = DYSwiftApp;

@@ -22,6 +22,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 print("(DingYueSDK):激活成功！")
                 print("(DingYueSDK):开关数据：\(switchs)")
                 print("(DingYueSDK):产品信息：\(subs)")
+            } else {
+                print("(DingYueSDK):激活失败----\(error)")
             }
 
         }

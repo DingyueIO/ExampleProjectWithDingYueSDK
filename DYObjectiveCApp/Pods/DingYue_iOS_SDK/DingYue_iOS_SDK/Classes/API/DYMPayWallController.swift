@@ -19,6 +19,17 @@ public class DYMPayWallController: UIViewController {
     var paywalls:[SKProduct] = []
     var completion:DYMPurchaseCompletion?
     weak var delegate: DYMPayWallActionDelegate?
+    var loadingTimer:Timer?
+
+    lazy var activity:UIActivityIndicatorView = {
+        let activity = UIActivityIndicatorView(activityIndicatorStyle: .whiteLarge)
+        activity.frame = CGRect(x: 0, y: 0, width: 60, height: 60)
+        activity.center = self.view.center
+        activity.backgroundColor = .white
+        activity.color = .gray
+        activity.startAnimating()
+        return activity
+    }()
     
     private lazy var webView: WKWebView = {
         let preference = WKPreferences()
@@ -32,6 +43,8 @@ public class DYMPayWallController: UIViewController {
         config.userContentController.add(self, name: "vip_purchase")
         config.userContentController.add(self, name: "vip_choose")
         let webView = WKWebView(frame: UIScreen.main.bounds, configuration: config)
+        webView.scrollView.showsHorizontalScrollIndicator = false
+        webView.scrollView.showsVerticalScrollIndicator = false
         webView.navigationDelegate = self
         webView.scrollView.bounces = false
         if #available(iOS 11.0, *) { webView.scrollView.contentInsetAdjustmentBehavior = .never }
@@ -45,20 +58,47 @@ public class DYMPayWallController: UIViewController {
     public override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
+        self.view.backgroundColor = .white
         view.addSubview(webView)
-        loadWebView()
+        view.addSubview(activity)
+
+        if DYMDefaultsManager.shared.isLoadingStatus == true {
+            activity.isHidden = true
+            loadWebView()
+        } else {
+            activity.isHidden = false
+            loadingTimer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(changeLoadingStatus), userInfo: nil, repeats: true)
+        }
     }
+
+    @objc func changeLoadingStatus() {
+        if DYMDefaultsManager.shared.isLoadingStatus == true {
+            activity.isHidden = true
+            loadWebView()
+            stopLoadingTimer()
+        }
+    }
+
+    func stopLoadingTimer() {
+        if loadingTimer != nil {
+            loadingTimer?.invalidate()
+            loadingTimer = nil
+        }
+    }
+
     public override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        eventManager.track(event: .ENTER_PURCHASE, user: UserProperties.requestUUID)
+        eventManager.track(event: "ENTER_PAYWALL")
     }
+
     public override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
-        eventManager.track(event: .EXIT_PURCHASE, user: UserProperties.requestUUID)
+        eventManager.track(event: "EXIT_PAYWALL")
+        stopLoadingTimer()
     }
     
-    private func loadWebView() {
-        if DYMDefaultsManager.shared.isExistPayWall == true || DYMDefaultsManager.shared.cachedProducts != nil {
+    public func loadWebView() {
+        if DYMDefaultsManager.shared.cachedPaywallPageIdentifier != nil {
             let basePath = UserProperties.pallwallPath ?? ""
             let fullPath = basePath + "/index.html"
             let url = URL(fileURLWithPath: fullPath)
@@ -119,21 +159,18 @@ extension DYMPayWallController: WKNavigationDelegate, WKScriptMessageHandler {
 
         let jsonString = getJSONStringFromDictionary(dictionary: dic as NSDictionary)
         let data = jsonString.data(using: .utf8)
-        print("ios to js data-----\(jsonString)")
         let base64Str:String? = data?.base64EncodedString() as? String
         webView.evaluateJavaScript("iostojs('\(base64Str!)')") { (response, error) in
-            print("evaluateJavaScript---\(response ?? "")")
         }
     }
     
     public func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
-        let user = UserProperties.requestUUID
         if message.name == "vip_close" {
-            eventManager.track(event: .CLOSE_BUTTON, user: user)
+            eventManager.track(event: "CLOSE_BUTTON")
 
             self.dismiss(animated: true, completion: nil)
         }else if message.name == "vip_restore" {
-            eventManager.track(event: .PURCHASE_RESTORE, user: user)
+            eventManager.track(event: "PURCHASE_RESTORE")
 
             ProgressView.show(rootViewConroller: self)
             DYMobileSDK.restorePurchase { receipt, purchaseResult, error in
@@ -144,17 +181,17 @@ extension DYMPayWallController: WKNavigationDelegate, WKScriptMessageHandler {
                 }
             }
         } else if message.name == "vip_terms" {
-            eventManager.track(event: .ABOUT_TERMSOFSERVICE, user: user)
+            eventManager.track(event: "ABOUT_TERMSOFSERVICE")
             if ((self.delegate?.clickTermsAction?(baseViewController: self)) != nil) {
                 self.delegate?.clickTermsAction!(baseViewController: self)
             }
         }else if message.name == "vip_privacy" {
-            eventManager.track(event: .ABOUT_PRIVACYPOLICY, user: user)
+            eventManager.track(event: "ABOUT_PRIVACYPOLICY")
             if ((self.delegate?.clickPrivacyAction?(baseViewController: self)) != nil) {
                 self.delegate?.clickPrivacyAction!(baseViewController: self)
             }
         }else if message.name == "vip_purchase" {
-            eventManager.track(event: .PURCHASE_START, user: user)
+            eventManager.track(event: "PURCHASE_START")
 
             let dic = message.body as? Dictionary<String,Any>
             if let productId = dic?["productId"] as? String {
@@ -162,11 +199,6 @@ extension DYMPayWallController: WKNavigationDelegate, WKScriptMessageHandler {
             }else {
                 self.completion?(nil,nil,.noProductIds)
             }
-        } else if message.name == "vip_choose" {
-
-            let dic = message.body as? Dictionary<String,Any>
-            _ = dic?["type"] as? String
-            _ = dic?["period"] as? String
         }
     }
 

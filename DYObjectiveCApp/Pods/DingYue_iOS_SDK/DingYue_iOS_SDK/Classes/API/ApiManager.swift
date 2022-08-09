@@ -19,16 +19,29 @@ public typealias sessionActivateCompletion = ([SwitchItem]?,[[String:Any]]?,Erro
 
 class ApiManager {
     var completion:sessionActivateCompletion?
+    var paywallIdentifier = ""
+    var paywallCustomize = false
     func startSession(){
         SessionsAPI.reportSession(X_USER_ID: UserProperties.requestUUID, userAgent: UserProperties.userAgent, X_APP_ID: DYMConstants.APIKeys.appId, X_PLATFORM: SessionsAPI.XPLATFORM_reportSession.ios, X_VERSION: UserProperties.sdkVersion, uniqueUserObject: UniqueUserObject(), apiResponseQueue: OpenAPIClientAPI.apiResponseQueue) { data, error in
             if (error != nil) {
                 DYMLogManager.logError(error!)
+                self.startSession()
+//                self.completion?(nil,nil,error)
             }else{
                 if data?.status == .ok {
                     if let paywall = data?.paywall {
                         DYMDefaultsManager.shared.cachedPaywalls = [paywall]
                         if paywall.downloadUrl != "" {
-                            self.downloadWebTemplate(url: URL(string: paywall.downloadUrl)!) { res, err in
+                            if let paywallId = data?.paywallId{
+                                let version = paywall.version
+                                self.paywallIdentifier = paywallId + "/" + String(version)
+                                self.paywallCustomize = paywall.customize
+                                if self.paywallIdentifier != DYMDefaultsManager.shared.cachedPaywallPageIdentifier {
+                                    self.downloadWebTemplate(url: URL(string: paywall.downloadUrl)!) { res, err in
+                                    }
+                                } else {
+                                    DYMDefaultsManager.shared.isLoadingStatus = true
+                                }
                             }
                         }
                         //内购项信息
@@ -38,6 +51,8 @@ class ApiManager {
                             subsArray.append(sub)
                         }
                         DYMDefaultsManager.shared.cachedProducts = subsArray
+                    } else {
+                        DYMDefaultsManager.shared.isLoadingStatus = true
                     }
 
                     if let switchItems = data?.switchItems {
@@ -48,13 +63,14 @@ class ApiManager {
                         DYMDefaultsManager.shared.cachedSubscribedObjects = subscribedProducts
                     }
                     print(data ?? "")
+                    //session report 返回开关状态数据和购买的产品信息
+                    let subscribedOjects = DYMDefaultsManager.shared.subscribedObjects(subscribedObjectArray: DYMDefaultsManager.shared.cachedSubscribedObjects)
+                    self.completion?(DYMDefaultsManager.shared.cachedSwitchItems,subscribedOjects,nil)
                 }else{
                     DYMLogManager.logError(data?.errmsg as Any)
+                    self.completion?(nil,nil,DYMError.failed)
                 }
             }
-            //session report 返回开关状态数据和购买的产品信息
-            let subscribedOjects = DYMDefaultsManager.shared.subscribedObjects(subscribedObjectArray: DYMDefaultsManager.shared.cachedSubscribedObjects)
-            self.completion?(DYMDefaultsManager.shared.cachedSwitchItems,subscribedOjects,error)
         }
     }
 
@@ -107,18 +123,25 @@ class ApiManager {
                         var items: [String]
                           do {
                               items = try FileManager.default.contentsOfDirectory(atPath: dstPath!)
+                              DYMDefaultsManager.shared.isLoadingStatus = true
                           } catch {
                            return
                           }
-                        print("purchase zip download successfully!---\(items)")
-                        DYMDefaultsManager.shared.isExistPayWall = true
+
+                        if self.paywallCustomize == false {
+                            if items.contains("config.js") {//订阅提供的内购页一定有config.js
+                                DYMDefaultsManager.shared.cachedPaywallPageIdentifier = self.paywallIdentifier
+                            }
+                        } else {
+                            DYMDefaultsManager.shared.cachedPaywallPageIdentifier = self.paywallIdentifier
+                        }
+
                     }
                     try? FileManager.default.removeItem(at: url!)
                 }else {
                     DYMLogManager.logError(error as Any)
                 }
             }
-
         }.resume()
     }
 
@@ -134,26 +157,21 @@ class ApiManager {
         ReceiptAPI.verifyFirstReceipt(X_USER_ID: UserProperties.requestUUID, userAgent: UserProperties.userAgent, X_APP_ID: DYMConstants.APIKeys.appId, X_PLATFORM: ReceiptAPI.XPLATFORM_verifyFirstReceipt.ios, X_VERSION: UserProperties.sdkVersion, firstReceiptVerifyPostObject: receiptObj, completion: completion)
     }
 
+    func verifySubscriptionFirstWith(receipt: String,for product: Dictionary<String, String>?,completion:@escaping FirstReceiptCompletion) {
+        guard let product = product else {
+            return
+        }
+        let platformProductId = product["productId"]!
+        let price = product["price"]!
+        let currency = product["currencyCode"]!
+        let countryCode = product["regionCode"]!
+
+        let receiptObj = FirstReceiptVerifyPostObject(appleReceipt: receipt, platformProductId: platformProductId, price: price, currencyCode: currency,countryCode: countryCode)
+        ReceiptAPI.verifyFirstReceipt(X_USER_ID: UserProperties.requestUUID, userAgent: UserProperties.userAgent, X_APP_ID: DYMConstants.APIKeys.appId, X_PLATFORM: ReceiptAPI.XPLATFORM_verifyFirstReceipt.ios, X_VERSION: UserProperties.sdkVersion, firstReceiptVerifyPostObject: receiptObj, completion: completion)
+    }
+
     func verifySubscriptionRecover(receipt: String,completion:@escaping RecoverReceiptCompletion) {
         let receiptObj = ReceiptVerifyPostObject(appleReceipt: receipt)
         ReceiptAPI.verifyReceipt(X_USER_ID: UserProperties.requestUUID, userAgent: UserProperties.userAgent, X_APP_ID: DYMConstants.APIKeys.appId, X_PLATFORM: ReceiptAPI.XPLATFORM_verifyReceipt.ios, X_VERSION: UserProperties.sdkVersion, receiptVerifyPostObject: receiptObj, completion: completion)
     }
-    
-//    func updateUser(attributes:[String],completion:((Bool,DYMError?) -> Void)? = nil) {
-//        SessionsAPI.updateUserAttribute(X_USER_ID: UserProperties.requestUUID, userAgent: UserProperties.userAgent, X_APP_ID: DYMConstants.APIKeys.appId, X_PLATFORM: SessionsAPI.XPLATFORM_updateUserAttribute.ios, editOneOf: <#T##[EditOneOf]#>) { data, error in
-//            if error != nil {
-//                completion?(false,DYMError(error!))
-//                return
-//            }
-//            if let result = data {
-//                if result.status == .ok {
-//                    completion?(true,nil)
-//                }else {
-//                    completion?(false,DYMError(code: .failed, message: result.errmsg ?? ""))
-//                }
-//                return
-//            }
-//            completion?(false,.failed)
-//        }
-//    }
 }

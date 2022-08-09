@@ -103,6 +103,17 @@ import StoreKit
     @objc public class func reportIdfa(idfa:String) {
         DYMLogManager.logMessage("Calling now: \(#function)")
         shared.apiManager.reportIdfa(idfa: idfa) { result, error in
+            if error != nil {
+                print("(dingyue):report idfa fail, error = \(error!)")
+            }
+
+            if result != nil {
+                if result?.status == .ok {
+                    print("(dingyue):report idfa ok")
+                } else {
+                    print("(dingyue):report idfa fail, errmsg = \(result?.errmsg ?? "")")
+                }
+            }
         }
     }
 
@@ -110,6 +121,17 @@ import StoreKit
     @objc public class func reportDeviceToken(token:String) {
         DYMLogManager.logMessage("Calling now: \(#function)")
         shared.apiManager.reportDeviceToken(token: token) { result, error in
+            if error != nil {
+                print("(dingyue):report DeviceToken fail, error = \(error!)")
+            }
+
+            if result != nil {
+                if result?.status == .ok {
+                    print("(dingyue):report DeviceToken ok")
+                } else {
+                    print("(dingyue):report DeviceToken fail, errmsg = \(result?.errmsg ?? "")")
+                }
+            }
         }
     }
 
@@ -118,12 +140,22 @@ import StoreKit
         DYMLogManager.logMessage("Calling now: \(#function)")
         let attributes = Attribution(adjustId: adjustId, appsFlyerId: appsFlyerId, amplitudeId: amplitudeId)
         shared.apiManager.reportAttribution(attribution: attributes) { result, error in
+            if error != nil {
+                print("(dingyue):report Attribution fail, error = \(error!)")
+            }
+
+            if result != nil {
+                if result?.status == .ok {
+                    print("(dingyue):report Attribution ok")
+                } else {
+                    print("(dingyue):report Attribution fail, errmsg = \(result?.errmsg ?? "")")
+                }
+            }
         }
     }
 #if os(iOS)
     private func reportAppleSearchAdsAttribution() {
         UserProperties.appleSearchAdsAttribution { (attribution, error) in
-            print("apple search ads attribution : ",attribution as Any)
             // check if this is an actual first sync
             guard let attribution = attribution, DYMDefaultsManager.shared.appleSearchAdsSyncDate == nil else { return }
 
@@ -149,6 +181,17 @@ import StoreKit
     private class func reportSearchAds(attribution: DYMParams) {
         let data = AnyCodable(attribution)
         shared.apiManager.updateSearchAdsAttribution(attribution: data) { result, error in
+            if error != nil {
+                print("(dingyue):report SearchAdsAttribution fail, error = \(error!)")
+            }
+
+            if result != nil {
+                if result?.status == .ok {
+                    print("(dingyue):report SearchAdsAttribution ok")
+                } else {
+                    print("(dingyue):report SearchAdsAttribution fail, errmsg = \(result?.errmsg ?? "")")
+                }
+        }
         }
     }
 
@@ -218,22 +261,23 @@ import StoreKit
         DYMLogManager.logMessage("Calling now: \(#function)")
         shared.apiManager.verifySubscriptionFirst(receipt: receipt, for: product, completion: completion)
     }
+    ///验证订单-first
+    @objc public class func validateReceiptFirstWith(_ receipt: String,for product:Dictionary<String, String>?,completion:@escaping FirstReceiptCompletion) {
+        DYMLogManager.logMessage("Calling now: \(#function)")
+        shared.apiManager.verifySubscriptionFirstWith(receipt: receipt, for: product, completion: completion)
+    }
     ///验证订单-recover
     @objc public class func validateReceiptRecover(_ receipt: String,completion:@escaping RecoverReceiptCompletion) {
         DYMLogManager.logMessage("Calling now: \(#function)")
         shared.apiManager.verifySubscriptionRecover(receipt: receipt, completion: completion)
     }
     /// MARK: - Events
-    @objc public class func track(event: Int, extra: String = "", user: String) {
+    @objc public class func track(event: String, extra: String? = nil, user: String? = nil) {
         DYMLogManager.logMessage("Calling now: \(#function)")
-        shared.eventManager.track(event: DYMEventType(rawValue: event)!, extra: extra, user: user)
+        if event != "" {
+            shared.eventManager.track(event: event, extra: extra, user: user)
+        }
     }
-
-//    /// MARK: - User Attributes
-//    @objc public class func customUser(attributes:[String],completion:((Bool,DYMError?)-> Void)? = nil) {
-//        DYMLogManager.logMessage("Calling now: \(#function)")
-//        shared.apiManager.updateUser(attributes: attributes, completion: completion)
-//    }
 
     @objc public class func handlePushNotification(_ userInfo: [AnyHashable : Any], completion: Error?) {
         DYMLogManager.logMessage("Calling now: \(#function)")
@@ -269,6 +313,7 @@ extension DYMobileSDK: DYMAppDelegateSwizzlerDelegate {
     func didReceiveAPNSToken(_ deviceToken: Data) {
         Self.apnsToken = deviceToken
         if let token = self.apnsTokenStr {
+            print("token----\(token)")
             Self.reportDeviceToken(token: token)
         }
     }

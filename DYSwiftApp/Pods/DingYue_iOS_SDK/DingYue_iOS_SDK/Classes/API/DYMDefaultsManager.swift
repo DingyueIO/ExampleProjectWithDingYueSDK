@@ -17,9 +17,6 @@ class DYMDefaultsManager {
     static let shared = DYMDefaultsManager()
     private var defaults = UserDefaults.standard
 
-    ///是否有存在内购页
-    public var isExistPayWall = false
-
     private init() {}
     init(with defaults: UserDefaults) {
         self.defaults = defaults
@@ -103,6 +100,18 @@ class DYMDefaultsManager {
         }
     }
 
+    var cachedPaywallPageIdentifier: String? {
+        get {
+            if let data = defaults.object(forKey: DYMConstants.UserDefaults.cachedPayWallPageIdentifier) as? String {
+                return data
+            }
+            return nil
+        }
+        set {
+            defaults.set(newValue, forKey: DYMConstants.UserDefaults.cachedPayWallPageIdentifier)
+        }
+    }
+
     var cachedProducts: [Subscription]? {
         get {
             if let data = defaults.object(forKey: DYMConstants.UserDefaults.cachedProducts) as? Data, let products = try? JSONDecoder().decode([Subscription].self, from: data) {
@@ -163,7 +172,6 @@ class DYMDefaultsManager {
         }
     }
 
-    // [%requestType: %hash]
     var previousResponseHashes: [String: String] {
         get {
             return (defaults.dictionary(forKey: DYMConstants.UserDefaults.previousResponseHashes) as? [String: String]) ?? [:]
@@ -173,7 +181,6 @@ class DYMDefaultsManager {
         }
     }
 
-    // [%requestType: [%hash: data]]
     var responseJSONCaches: [String: [String: Data]] {
         get {
             return (defaults.dictionary(forKey: DYMConstants.UserDefaults.responseJSONCaches) as? [String: [String: Data]]) ?? [:]
@@ -197,9 +204,7 @@ class DYMDefaultsManager {
             for sub in cacheSubscribledObjects {
                 var subDic:[String:Any] = [:]
                 subDic["platformProductId"] = sub.platformProductId
-                if let originalTransactionId = sub.originalTransactionId {
-                    subDic["originalTransactionId"] = originalTransactionId
-                }
+                subDic["originalTransactionId"] = sub.originalTransactionId
                 if let expiresAt = sub.expiresAt {
                     subDic["expiresAt"] = expiresAt
                 }
@@ -208,6 +213,8 @@ class DYMDefaultsManager {
         }
         return subsArray
     }
+
+    var isLoadingStatus: Bool = false
 
     func subscribedObjects(subscribedObjectArray: [SubscribedObject?]?) -> [[String:Any]] {
         var subsArray:[[String:Any]] = []
@@ -250,6 +257,7 @@ class DYMDefaultsManager {
         defaults.removeObject(forKey: DYMConstants.UserDefaults.cachedEvents)
         defaults.removeObject(forKey: DYMConstants.UserDefaults.cachedVariationsIds)
         defaults.removeObject(forKey: DYMConstants.UserDefaults.cachedPaywalls)
+        defaults.removeObject(forKey: DYMConstants.UserDefaults.cachedPayWallPageIdentifier)
         defaults.removeObject(forKey: DYMConstants.UserDefaults.cachedProducts)
         defaults.removeObject(forKey: DYMConstants.UserDefaults.cachedSwitchItems)
         defaults.removeObject(forKey: DYMConstants.UserDefaults.cachedSubscribedObjects)

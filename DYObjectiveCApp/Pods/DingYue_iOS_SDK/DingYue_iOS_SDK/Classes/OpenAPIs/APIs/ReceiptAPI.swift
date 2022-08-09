@@ -37,7 +37,12 @@ open class ReceiptAPI {
         return verifyFirstReceiptWithRequestBuilder(X_USER_ID: X_USER_ID, userAgent: userAgent, X_APP_ID: X_APP_ID, X_PLATFORM: X_PLATFORM,X_VERSION: X_VERSION, firstReceiptVerifyPostObject: firstReceiptVerifyPostObject).execute(apiResponseQueue) { result in
             switch result {
             case let .success(response):
-                completion(DYMDefaultsManager.shared.firstReceiptResponse(firstReceiptResponse: response.body), nil)
+                    if response.body.status == .ok {
+                        completion(DYMDefaultsManager.shared.firstReceiptResponse(firstReceiptResponse: response.body), nil)
+                    } else {
+                        completion(nil, DYMError(code: .failed, message: response.body.errmsg ?? ""))
+                    }
+
             case let .failure(error):
                 completion(nil, error)
             }
@@ -107,7 +112,11 @@ open class ReceiptAPI {
         return verifyReceiptWithRequestBuilder(X_USER_ID: X_USER_ID, userAgent: userAgent, X_APP_ID: X_APP_ID, X_PLATFORM: X_PLATFORM, X_VERSION: X_VERSION, receiptVerifyPostObject: receiptVerifyPostObject).execute(apiResponseQueue) { result in
             switch result {
             case let .success(response):
-                    completion(DYMDefaultsManager.shared.recoverReceiptResponse(recoverReceiptResponse: response.body), nil)
+                    if response.body.status == .ok {
+                        completion(DYMDefaultsManager.shared.recoverReceiptResponse(recoverReceiptResponse: response.body), nil)
+                    } else {
+                        completion(nil, DYMError.failed)
+                    }
             case let .failure(error):
                 completion(nil, error)
             }

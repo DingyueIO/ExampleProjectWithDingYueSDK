@@ -20,13 +20,29 @@
     [super viewDidLoad];
 }
 - (IBAction)goPurchaseAction:(id)sender {
-    //使用DingYue内购页
-    [DYMobileSDK showVisualPaywallWithProducts:nil rootController:self completion:^(NSString * recipt, NSArray<NSDictionary<NSString *,id> *> * subs, DYMError * error) {
+    [DYMobileSDK trackWithEvent:@"" extra:nil user:nil];
+
+
+
+    [DYMobileSDK validateReceiptRecover:@"" completion:^(NSDictionary<NSString *,id> * result, NSError * error) {
         if (error == nil) {
             //购买成功
-            NSLog(@"(DingYueSDK): 购买成功");
-            NSLog(@"(DingYueSDK): 购买收据：%@",recipt);
-            NSLog(@"(DingYueSDK): 购买产品信息：%@",subs);
+        }
+    }];
+
+//    [DYMobileSDK validateReceiptFirst:@"" for:skproduct completion:^(NSDictionary<NSString *,id> * result, NSError * error) {
+//        if (error == nil) {
+//            //购买成功
+//        }
+//    }];
+
+
+
+    //使用DingYue内购页
+    Subscription *defaultProduct = [[Subscription alloc] initWithType:@"SUBSCRIPTION" name:@"WEEK" platformProductId:@"testWeek" subscriptionDescription:@"test" period:@"week" price:@"7.99" currencyCode:@"USD" countryCode:@"US"];
+    [DYMobileSDK showVisualPaywallWithProducts:@[defaultProduct] rootController:self completion:^(NSString * receipt, NSArray<NSDictionary<NSString *,id> *> * purchasedInfo, DYMError * error) {
+        if (error == nil) {
+            //购买成功
         }
     }];
 }
@@ -48,4 +64,13 @@
     [baseViewController presentViewController:nav animated:YES completion:nil];
 }
 
+- (void)clickCloseButtonWithBaseViewController:(UIViewController *)baseViewController {
+    NSLog(@"点击了内购页上的关闭按钮");
+}
+- (void)payWallDidAppearWithBaseViewController:(UIViewController *)baseViewController {
+    NSLog(@"订阅内购页显示");
+}
+- (void)payWallDidDisappearWithBaseViewController:(UIViewController *)baseViewController {
+    NSLog(@"订阅内购页关闭");
+}
 @end

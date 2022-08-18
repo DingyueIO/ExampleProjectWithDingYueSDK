@@ -55,5 +55,15 @@ extension ViewController:DYMPayWallActionDelegate {
         let nav = UINavigationController.init(rootViewController: vc)
         baseViewController.present(nav, animated: true)
     }
+
+    func clickCloseButton(baseViewController: UIViewController) {
+        print("点击内购页上的关闭按钮")
+    }
+    func payWallDidAppear(baseViewController: UIViewController) {
+        print("内购页显示")
+    }
+    func payWallDidDisappear(baseViewController: UIViewController) {
+        print("内购页消失")
+    }
 }
 

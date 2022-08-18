@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		26BCC24CB7E2F056022A43E1 /* Pods_DYObjectiveCApp.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 281F559201D2E87E38661DC3 /* Pods_DYObjectiveCApp.framework */; };
 		47DF7A1F287D9E6900033058 /* DingYue.plist in Resources */ = {isa = PBXBuildFile; fileRef = 47DF7A1E287D9E6900033058 /* DingYue.plist */; };
 		47E28DB428782CA300B98D58 /* PTWebViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 47E28DB228782CA300B98D58 /* PTWebViewController.m */; };
 		47FF2CD828755C4B00437080 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 47FF2CD728755C4B00437080 /* AppDelegate.m */; };
@@ -17,6 +16,7 @@
 		47FF2CE628755C4C00437080 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 47FF2CE428755C4C00437080 /* LaunchScreen.storyboard */; };
 		47FF2CE928755C4C00437080 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 47FF2CE828755C4C00437080 /* main.m */; };
 		47FF2D962877F38B00437080 /* SwiftTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47FF2D952877F38B00437080 /* SwiftTest.swift */; };
+		77557529D19B175E9FDC4022 /* Pods_DYObjectiveCApp.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8BAB17BCD77D67E7DFBBBB12 /* Pods_DYObjectiveCApp.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -32,7 +32,6 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		281F559201D2E87E38661DC3 /* Pods_DYObjectiveCApp.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_DYObjectiveCApp.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		47DF7A1E287D9E6900033058 /* DingYue.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = DingYue.plist; sourceTree = "<group>"; };
 		47E28DB228782CA300B98D58 /* PTWebViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PTWebViewController.m; sourceTree = "<group>"; };
 		47E28DB328782CA300B98D58 /* PTWebViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PTWebViewController.h; sourceTree = "<group>"; };
@@ -48,8 +47,9 @@
 		47FF2CE828755C4C00437080 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		47FF2D942877F38A00437080 /* DYObjectiveCApp-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "DYObjectiveCApp-Bridging-Header.h"; sourceTree = "<group>"; };
 		47FF2D952877F38B00437080 /* SwiftTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftTest.swift; sourceTree = "<group>"; };
-		4BCFFEE487E00F50A8F12157 /* Pods-DYObjectiveCApp.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DYObjectiveCApp.debug.xcconfig"; path = "Target Support Files/Pods-DYObjectiveCApp/Pods-DYObjectiveCApp.debug.xcconfig"; sourceTree = "<group>"; };
-		E076820AE30012E132DAAC3D /* Pods-DYObjectiveCApp.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DYObjectiveCApp.release.xcconfig"; path = "Target Support Files/Pods-DYObjectiveCApp/Pods-DYObjectiveCApp.release.xcconfig"; sourceTree = "<group>"; };
+		8BAB17BCD77D67E7DFBBBB12 /* Pods_DYObjectiveCApp.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_DYObjectiveCApp.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		D3F4AB5BA7764BDD54E8AFA6 /* Pods-DYObjectiveCApp.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DYObjectiveCApp.debug.xcconfig"; path = "Target Support Files/Pods-DYObjectiveCApp/Pods-DYObjectiveCApp.debug.xcconfig"; sourceTree = "<group>"; };
+		FFFE964EF4EC53D945514D5D /* Pods-DYObjectiveCApp.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DYObjectiveCApp.release.xcconfig"; path = "Target Support Files/Pods-DYObjectiveCApp/Pods-DYObjectiveCApp.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -57,20 +57,28 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				26BCC24CB7E2F056022A43E1 /* Pods_DYObjectiveCApp.framework in Frameworks */,
+				77557529D19B175E9FDC4022 /* Pods_DYObjectiveCApp.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		0D5A35590A42024339A1A0BB /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				8BAB17BCD77D67E7DFBBBB12 /* Pods_DYObjectiveCApp.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		47FF2CCA28755C4B00437080 = {
 			isa = PBXGroup;
 			children = (
 				47FF2CD528755C4B00437080 /* DYObjectiveCApp */,
 				47FF2CD428755C4B00437080 /* Products */,
 				6D3BCD7D3E5E943CFD182526 /* Pods */,
-				92B1E43B3D9022EE6385B959 /* Frameworks */,
+				0D5A35590A42024339A1A0BB /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -106,18 +114,10 @@
 		6D3BCD7D3E5E943CFD182526 /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				4BCFFEE487E00F50A8F12157 /* Pods-DYObjectiveCApp.debug.xcconfig */,
-				E076820AE30012E132DAAC3D /* Pods-DYObjectiveCApp.release.xcconfig */,
+				D3F4AB5BA7764BDD54E8AFA6 /* Pods-DYObjectiveCApp.debug.xcconfig */,
+				FFFE964EF4EC53D945514D5D /* Pods-DYObjectiveCApp.release.xcconfig */,
 			);
 			path = Pods;
-			sourceTree = "<group>";
-		};
-		92B1E43B3D9022EE6385B959 /* Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-				281F559201D2E87E38661DC3 /* Pods_DYObjectiveCApp.framework */,
-			);
-			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -127,12 +127,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 47FF2CEC28755C4C00437080 /* Build configuration list for PBXNativeTarget "DYObjectiveCApp" */;
 			buildPhases = (
-				C1BC16B64EDFF813A158C42F /* [CP] Check Pods Manifest.lock */,
+				518FE25EF619F86E34517593 /* [CP] Check Pods Manifest.lock */,
 				47FF2CCF28755C4B00437080 /* Sources */,
 				47FF2CD028755C4B00437080 /* Frameworks */,
 				47FF2CD128755C4B00437080 /* Resources */,
 				47FF2DA62877FBAC00437080 /* CopyFiles */,
-				B724D9FE970666E8A42576C7 /* [CP] Embed Pods Frameworks */,
+				198AA1207E011E07E79679DA /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -191,7 +191,7 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		B724D9FE970666E8A42576C7 /* [CP] Embed Pods Frameworks */ = {
+		198AA1207E011E07E79679DA /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -208,7 +208,7 @@
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-DYObjectiveCApp/Pods-DYObjectiveCApp-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		C1BC16B64EDFF813A158C42F /* [CP] Check Pods Manifest.lock */ = {
+		518FE25EF619F86E34517593 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -379,7 +379,7 @@
 		};
 		47FF2CED28755C4C00437080 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 4BCFFEE487E00F50A8F12157 /* Pods-DYObjectiveCApp.debug.xcconfig */;
+			baseConfigurationReference = D3F4AB5BA7764BDD54E8AFA6 /* Pods-DYObjectiveCApp.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -416,7 +416,7 @@
 		};
 		47FF2CEE28755C4C00437080 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = E076820AE30012E132DAAC3D /* Pods-DYObjectiveCApp.release.xcconfig */;
+			baseConfigurationReference = FFFE964EF4EC53D945514D5D /* Pods-DYObjectiveCApp.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;

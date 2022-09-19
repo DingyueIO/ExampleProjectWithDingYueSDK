@@ -28,6 +28,8 @@
             NSLog(@"(DingYueSDK): subscribedProducts  %@",results);
         }
     }];
+
+    
     return YES;
 }
 

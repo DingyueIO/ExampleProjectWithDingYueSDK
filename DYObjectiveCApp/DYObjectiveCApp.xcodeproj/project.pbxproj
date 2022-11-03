@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		4771E67129138ABA005EA711 /* 7004562396901827888 in Resources */ = {isa = PBXBuildFile; fileRef = 4771E67029138ABA005EA711 /* 7004562396901827888 */; };
 		47DF7A1F287D9E6900033058 /* DingYue.plist in Resources */ = {isa = PBXBuildFile; fileRef = 47DF7A1E287D9E6900033058 /* DingYue.plist */; };
 		47E28DB428782CA300B98D58 /* PTWebViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 47E28DB228782CA300B98D58 /* PTWebViewController.m */; };
 		47FF2CD828755C4B00437080 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 47FF2CD728755C4B00437080 /* AppDelegate.m */; };
@@ -32,6 +33,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		4771E67029138ABA005EA711 /* 7004562396901827888 */ = {isa = PBXFileReference; lastKnownFileType = folder; name = 7004562396901827888; path = DYObjectiveCApp/7004562396901827888; sourceTree = "<group>"; };
 		47DF7A1E287D9E6900033058 /* DingYue.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = DingYue.plist; sourceTree = "<group>"; };
 		47E28DB228782CA300B98D58 /* PTWebViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PTWebViewController.m; sourceTree = "<group>"; };
 		47E28DB328782CA300B98D58 /* PTWebViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PTWebViewController.h; sourceTree = "<group>"; };
@@ -75,6 +77,7 @@
 		47FF2CCA28755C4B00437080 = {
 			isa = PBXGroup;
 			children = (
+				4771E67029138ABA005EA711 /* 7004562396901827888 */,
 				47FF2CD528755C4B00437080 /* DYObjectiveCApp */,
 				47FF2CD428755C4B00437080 /* Products */,
 				6D3BCD7D3E5E943CFD182526 /* Pods */,
@@ -181,6 +184,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4771E67129138ABA005EA711 /* 7004562396901827888 in Resources */,
 				47DF7A1F287D9E6900033058 /* DingYue.plist in Resources */,
 				47FF2CE628755C4C00437080 /* LaunchScreen.storyboard in Resources */,
 				47FF2CE328755C4C00437080 /* Assets.xcassets in Resources */,

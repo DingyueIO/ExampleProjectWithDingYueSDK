@@ -30,6 +30,9 @@ class ViewController: UIViewController{
         let product = Subscription(type: "CONSUMABLE", name: "消耗品2", platformProductId: "com.dingyue.consumable2", price: "12.99", currencyCode: "USD",countryCode: "USD")
         let product2 = Subscription(type: "CONSUMABLE", name: "hello test", platformProductId: "com.dingyue.consumable1", appleSubscriptionGroupId: "", description: "消耗", period: "MONTH", price: "34.0", currencyCode: "USD", countryCode: "USD", priceTier: [], gracePeriod: true, icon: "", renewPriceChange: true)
 
+        /*
+         *
+         */
         //显示sdk内购页
         DYMobileSDK.showVisualPaywall(products: [product,product2], rootController: self) { receipt, purchaseResult, error in
             if error == nil {

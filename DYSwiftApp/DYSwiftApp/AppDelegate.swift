@@ -17,15 +17,22 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
         //DingYueSDK 激活
-        DYMobileSDK.activate { switchs, subs, error in
+        /*
+         results
+         */
+        DYMobileSDK.activate { results, error in
             if error == nil {
-                print("(DingYueSDK):激活成功！")
-                print("(DingYueSDK):开关数据：\(switchs)")
-                print("(DingYueSDK):产品信息：\(subs)")
-            } else {
-                print("(DingYueSDK):激活失败----\(error)")
+                if let result = results {
+                    if let isUseNativePaywall = result["isUseNativePaywall"] as? Bool, let nativePaywallId = result["nativePaywallId"] as? String {
+                        //当要用本地内购页时需要提前设置本地内购页路径
+                        if isUseNativePaywall == true {
+                            //本地内购页要以 nativePaywallId 为包名
+                            let filePath1 = Bundle.main.path(forResource: "index", ofType: ".html", inDirectory: nativePaywallId)
+                            DYMobileSDK.loadNativePaywall(paywallFullPath: filePath1!, basePath: Bundle.main.bundlePath + nativePaywallId)
+                        }
+                    }
+                }
             }
-
         }
         return true
     }

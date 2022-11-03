@@ -19,13 +19,22 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     // Override point for customization after application launch.
-    //激活session report
-    [DYMobileSDK activateWithCompletion:^(NSArray<SwitchItem *> * switchItems, NSArray<NSDictionary<NSString *,id> *> * results, NSError * error) {
+    //激活DingYue SDK
+    [DYMobileSDK activateWithCompletion:^(NSDictionary<NSString *,id> * results, NSError * error) {
         if (error == nil) {
-            //激活成功
-            NSLog(@"(DingYueSDK):激活成功");
-            NSLog(@"(DingYueSDK): switchItems  %@",switchItems);
-            NSLog(@"(DingYueSDK): subscribedProducts  %@",results);
+            NSLog(@"%@",results);
+
+            bool isUseNativePaywall = results[@"isUseNativePaywall"];
+            NSString *nativePaywallId = results[@"nativePaywallId"];
+
+            //当要用本地内购页时需要提前设置本地内购页路径
+            if (isUseNativePaywall && nativePaywallId && ![nativePaywallId isEqual:@""]) {
+                //本地内购页要以 nativePaywallId 为包名
+                NSString *nativePaywallPackage = results[@"nativePaywallId"];
+                NSString *nativePaywallPath = [[NSBundle mainBundle] pathForResource:@"index" ofType:@".html" inDirectory:nativePaywallPackage];
+                NSString *basePath = [NSString stringWithFormat:@"%@%@",[[NSBundle mainBundle] bundlePath],nativePaywallPackage];
+                [DYMobileSDK loadNativePaywallWithPaywallFullPath:nativePaywallPath basePath:basePath];
+            }
         }
     }];
 

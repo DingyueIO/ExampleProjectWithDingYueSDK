@@ -22,8 +22,6 @@
     //激活DingYue SDK
     [DYMobileSDK activateWithCompletion:^(NSDictionary<NSString *,id> * results, NSError * error) {
         if (error == nil) {
-            NSLog(@"%@",results);
-
             bool isUseNativePaywall = results[@"isUseNativePaywall"];
             NSString *nativePaywallId = results[@"nativePaywallId"];
 
@@ -35,8 +33,36 @@
                 NSString *basePath = [NSString stringWithFormat:@"%@%@",[[NSBundle mainBundle] bundlePath],nativePaywallPackage];
                 [DYMobileSDK loadNativePaywallWithPaywallFullPath:nativePaywallPath basePath:basePath];
             }
+
+
+            if (results) {
+                //网页自定义开关
+                NSArray<SwitchItem *> *switchs = results[@"switchs"];
+                //购买过的有效产品
+                NSArray<NSDictionary<NSString *,id>*> *subscribedOjects = results[@"subscribedOjects"];
+                //远程开关：在开发阶段工程师利用'[DYMobileSDK createGlobalSwitchWithGlobalSwitch: completion:]' 方法创建的远程开关
+                NSArray<GlobalSwitch *> *globalSwitchs = results[@"globalSwitchItems"];
+                //是否使用本地内购页
+                BOOL isUseNativePaywall = results[@"isUseNativePaywall"];
+                if (isUseNativePaywall == YES) {
+                    //本地内购页ID（内购页包名）
+                    NSString *nativePaywallId = results[@"nativePaywallId"];
+                    //使用本地内购页的话，需要工程师提前通过‘[DYMobileSDK loadNativePaywallWithPaywallFullPath: basePath:]’方法设置本地内购页Path
+                }
+            }
+
+            GlobalSwitch *globalSwitch = [[GlobalSwitch alloc] initWithShowName:@"ShowNameOC" varName:@"varName" value:true];
+            [DYMobileSDK createGlobalSwitchWithGlobalSwitch:globalSwitch completion:^(SimpleStatusResult * data, NSError * error) {
+                if (error == nil && data.errmsg == nil) {
+                    //创建成功
+                }
+            }];
+
+
         }
     }];
+
+    [DYMobileSDK trackWithEvent:@"name" extra:@"DingYue Latested V OC App Test" user:nil];
 
     
     return YES;

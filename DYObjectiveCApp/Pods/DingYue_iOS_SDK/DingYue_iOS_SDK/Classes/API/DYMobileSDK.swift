@@ -21,6 +21,8 @@ import AdSupport
     
     ///判断是否需要IDFA
     @objc public static var idfaCollectionDisabled: Bool = false
+    ///判断是否使用默认CV规则
+    @objc public static var defaultConversionValueEnabled: Bool = false
     ///是否已完成配置
     private var isConfigured = false
     ///场景控制器
@@ -78,7 +80,7 @@ import AdSupport
         }
         DYMConstants.APIKeys.appId = appId
         DYMConstants.APIKeys.secretKey = apiKey
-
+        
         shared.configure(completion: completion)
     }
     ///Configure
@@ -97,61 +99,11 @@ import AdSupport
         
         sendAppleSearchAdsAttribution()
     }
-    
-    func sendAppleSearchAdsAttribution() {
-        //IDFA
-        if #available(iOS 14, *) {
-            let state = ATTrackingManager.trackingAuthorizationStatus
-            if state == .notDetermined {
-                self.reportAppleSearchAdsAttribution()
-                var isSendRequest = false
-                NotificationCenter.default.addObserver(forName: Notification.Name.UIApplicationDidBecomeActive, object: nil, queue: .main) { notification in
-                    if isSendRequest == false {
-                        ATTrackingManager.requestTrackingAuthorization(completionHandler: { status in
-                            isSendRequest = true
-                            self.reportAppleSearchAdsAttribution()
-                            
-                            if status == .authorized {
-                                Self.reportIdfa(idfa: ASIdentifierManager.shared().advertisingIdentifier.uuidString)
-                            }
-                            
-                        })
-                    }
-                }
-            } else {
-                reportAppleSearchAdsAttribution()
-                
-                if state == .authorized {
-                    Self.reportIdfa(idfa: ASIdentifierManager.shared().advertisingIdentifier.uuidString)
-                }
-                
-            }
-        } else {
-            reportAppleSearchAdsAttribution()
-            
-            if ASIdentifierManager.shared().isAdvertisingTrackingEnabled {
-                Self.reportIdfa(idfa: ASIdentifierManager.shared().advertisingIdentifier.uuidString)
-            }
-            
-        }
-
-    }
 
     // MARK: - idfa
     @objc public class func reportIdfa(idfa:String) {
         DYMLogManager.logMessage("Calling now: \(#function)")
         shared.apiManager.reportIdfa(idfa: idfa) { result, error in
-            if error != nil {
-                print("(dingyue):report idfa fail, error = \(error!)")
-            }
-
-            if result != nil {
-                if result?.status == .ok {
-                    print("(dingyue):report idfa ok")
-                } else {
-                    print("(dingyue):report idfa fail, errmsg = \(result?.errmsg ?? "")")
-                }
-            }
         }
     }
 
@@ -159,17 +111,6 @@ import AdSupport
     @objc public class func reportDeviceToken(token:String) {
         DYMLogManager.logMessage("Calling now: \(#function)")
         shared.apiManager.reportDeviceToken(token: token) { result, error in
-            if error != nil {
-                print("(dingyue):report DeviceToken fail, error = \(error!)")
-            }
-
-            if result != nil {
-                if result?.status == .ok {
-                    print("(dingyue):report DeviceToken ok")
-                } else {
-                    print("(dingyue):report DeviceToken fail, errmsg = \(result?.errmsg ?? "")")
-                }
-            }
         }
     }
 
@@ -178,17 +119,6 @@ import AdSupport
         DYMLogManager.logMessage("Calling now: \(#function)")
         let attributes = Attribution(adjustId: adjustId, appsFlyerId: appsFlyerId, amplitudeId: amplitudeId)
         shared.apiManager.reportAttribution(attribution: attributes) { result, error in
-            if error != nil {
-                print("(dingyue):report Attribution fail, error = \(error!)")
-            }
-
-            if result != nil {
-                if result?.status == .ok {
-                    print("(dingyue):report Attribution ok")
-                } else {
-                    print("(dingyue):report Attribution fail, errmsg = \(result?.errmsg ?? "")")
-                }
-            }
         }
     }
 #if os(iOS)
@@ -219,21 +149,26 @@ import AdSupport
 
     // MARK: - Subscription
     ///通过产品ID 购买
-    @objc public class func purchase(productId: String,completion:@escaping DYMPurchaseCompletion) {
+    @objc public class func purchase(productId: String, productPrice:String? = nil, completion:@escaping DYMPurchaseCompletion) {
         DYMLogManager.logMessage("Calling now: \(#function)")
         shared.iapManager.buy(productId: productId) { purchase, receiptVerifyMobileResponse in
             switch purchase {
             case .succeed(let purchase):
-                    if let subs = receiptVerifyMobileResponse {
-                        completion(purchase.receipt,subs["subscribledObject"] as? [[String : Any]],nil)
-                    } else {
-                        completion(purchase.receipt,nil,nil)
-                    }
+                if self.defaultConversionValueEnabled && productPrice != nil  {
+                    self.updateCVWithTargetProductPrice(price: productPrice!)
+                }
+                
+                if let subs = receiptVerifyMobileResponse {
+                    completion(purchase.receipt,subs["subscribledObject"] as? [[String : Any]],nil)
+                } else {
+                    completion(purchase.receipt,nil,nil)
+                }
             case .failure(let error):
                 completion(nil,nil,error)
             }
         }
     }
+    
     ///通过产品信息购买
     public class func purchase(product: SKProduct,completion:@escaping DYMPurchaseCompletion) {
         DYMLogManager.logMessage("Calling now: \(#function)")
@@ -293,20 +228,39 @@ import AdSupport
         DYMLogManager.logMessage("Calling now: \(#function)")
         shared.apiManager.verifySubscriptionRecover(receipt: receipt, completion: completion)
     }
-    /// MARK: - Events
+    // MARK: - Events
     @objc public class func track(event: String, extra: String? = nil, user: String? = nil) {
         DYMLogManager.logMessage("Calling now: \(#function)")
         if event != "" {
+            if DYMConstants.APIKeys.appId == "" || DYMConstants.APIKeys.secretKey == "" {
+                //读取DingYue.plist信息
+                let path = Bundle.main.path(forResource: DYMConstants.AppInfoName.plistName, ofType: DYMConstants.AppInfoName.plistType)
+                guard let plistPath = path else {
+                    return
+                }
+                guard let appInfoDictionary = NSMutableDictionary(contentsOfFile: plistPath) else {
+                    return
+                }
+                guard let appId = appInfoDictionary.value(forKey: DYMConstants.AppInfoName.appId) as? String, let apiKey = appInfoDictionary.value(forKey: DYMConstants.AppInfoName.apiKey) as? String else{
+                    return
+                }
+                DYMConstants.APIKeys.appId = appId
+                DYMConstants.APIKeys.secretKey = apiKey
+            }
             shared.eventManager.track(event: event, extra: extra, user: user)
         }
     }
-    /// MARK: - load native paywall
+    // MARK: - Load native paywall
     @objc public class func loadNativePaywall(paywallFullPath: String,basePath:String) {
         DYMLogManager.logMessage("Calling now: \(#function)")
         DYMDefaultsManager.shared.nativePaywallBasePath = basePath
         DYMDefaultsManager.shared.nativePaywallPath = paywallFullPath
     }
-
+    // MARK: - Default paywall
+    @objc public class func setDefaultPaywall(paywallFullPath: String,basePath:String) {
+        DYMDefaultsManager.shared.defaultPaywallPath = paywallFullPath
+    }
+    //MARK: - Handle remote notification
     @objc public class func handlePushNotification(_ userInfo: [AnyHashable : Any], completion: Error?) {
         DYMLogManager.logMessage("Calling now: \(#function)")
 
@@ -322,6 +276,7 @@ import AdSupport
         }
     }
 
+    // MARK: - Switchs
     //request switch status with switch name
     @objc public class func getSwitchStatus(switchName: String)->Bool {
         guard let switchItems = DYMDefaultsManager.shared.cachedSwitchItems else {
@@ -335,7 +290,7 @@ import AdSupport
         return false
     }
     
-    /// MARK: - Switchs info
+    ///Golbal Switch
     @objc public class func createGlobalSwitch(globalSwitch: GlobalSwitch,completion:@escaping ((SimpleStatusResult?,Error?)->())) {
         DYMLogManager.logMessage("Calling now: \(#function)")
         #if DEBUG
@@ -350,6 +305,118 @@ import AdSupport
         DYMLogManager.logMessage("Calling now: \(#function)")
         return UserProperties.requestUUID
     }
+    
+    //MARK: - private method
+    private func sendAppleSearchAdsAttribution() {
+        //IDFA
+        if #available(iOS 14, *) {
+            let state = ATTrackingManager.trackingAuthorizationStatus
+            if state == .notDetermined {
+                self.reportAppleSearchAdsAttribution()
+                var isSendRequest = false
+                NotificationCenter.default.addObserver(forName: Notification.Name.UIApplicationDidBecomeActive, object: nil, queue: .main) { notification in
+                    if isSendRequest == false {
+                        ATTrackingManager.requestTrackingAuthorization(completionHandler: { status in
+                            isSendRequest = true
+                            self.reportAppleSearchAdsAttribution()
+                            
+                            if status == .authorized {
+                                Self.reportIdfa(idfa: ASIdentifierManager.shared().advertisingIdentifier.uuidString)
+                            }
+                            
+                        })
+                    }
+                }
+            } else {
+                reportAppleSearchAdsAttribution()
+                
+                if state == .authorized {
+                    Self.reportIdfa(idfa: ASIdentifierManager.shared().advertisingIdentifier.uuidString)
+                }
+                
+            }
+        } else {
+            reportAppleSearchAdsAttribution()
+            
+            if ASIdentifierManager.shared().isAdvertisingTrackingEnabled {
+                Self.reportIdfa(idfa: ASIdentifierManager.shared().advertisingIdentifier.uuidString)
+            }
+            
+        }
+
+    }
+    
+    private class func updateCVWithTargetProductPrice(price:String) {
+        let sdkBundle = Bundle(for: DYMobileSDK.self)
+        guard let resourceBundleURL = sdkBundle.url(forResource: "DingYue_iOS_SDK", withExtension: "bundle")else { fatalError("DingYue_iOS_SDK.bundle not found, do not get conversion value data.") }
+        guard let resourceBundle = Bundle(url: resourceBundleURL)else { fatalError("Cannot access DingYue_iOS_SDK.bundle,do not do not get conversion value data.") }
+        if let path = resourceBundle.path(forResource: "DingYueConversionValueMap", ofType: "plist") {
+            if let appInfoDictionary = NSMutableDictionary(contentsOfFile: path) {
+                if let valueArray = appInfoDictionary.allKeys as? [String] {
+                    if valueArray.contains(price) {
+                        let value = appInfoDictionary[price] as? Int ?? 0
+                        DYMobileSDK.shared.updateConversionValueWithDefaultRule(value: value)
+                    }
+                }
+            }
+        }
+    }
+    
+    
+    func updateConversionValueWithDefaultRule(value: Int) {
+        //update conversion value
+        if #available(iOS 16.1, *) {
+            
+        #if compiler(>=5.7)
+            var coarse = SKAdNetwork.CoarseConversionValue.low
+            var coarseDY = ConversionRequest.CoarseValue.low
+            if value <= 21 {
+                coarse = SKAdNetwork.CoarseConversionValue.low
+                coarseDY = ConversionRequest.CoarseValue.low
+            } else if value > 21 && value <= 42 {
+                coarse = SKAdNetwork.CoarseConversionValue.medium
+                coarseDY = ConversionRequest.CoarseValue.medium
+            } else { //>42
+                coarse = SKAdNetwork.CoarseConversionValue.high
+                coarseDY = ConversionRequest.CoarseValue.high
+            }
+            SKAdNetwork.updatePostbackConversionValue(value, coarseValue: coarse, lockWindow: false) { error in
+                print("dingyue cv iOS 16.1 * compiler high value is \(value)")
+                
+                DYMobileSDK.shared.apiManager.reportConversionValue(cv: value, coarseValue: coarseDY)
+            }
+        #else
+            SKAdNetwork.updatePostbackConversionValue(value) { error in
+                print("dingyue cv iOS 16.1 * compiler low value is \(value)")
+                DYMobileSDK.shared.apiManager.reportConversionValue(cv: value)
+            }
+        #endif
+            
+        } else {
+            // Fallback on earlier versions
+            if #available(iOS 15.4, *) {
+                SKAdNetwork.updatePostbackConversionValue(value) { error in
+                    print("dingyue cv iOS 15.4 * value is \(value)")
+                    DYMobileSDK.shared.apiManager.reportConversionValue(cv: value)
+                }
+ 
+            } else {
+                // Fallback on earlier versions
+                if #available(iOS 14.0, *) {
+                    SKAdNetwork.updateConversionValue(value)
+                    DYMobileSDK.shared.apiManager.reportConversionValue(cv: value)
+                    print("dingyue cv iOS 14.0 * value is \(value)")
+                } else {
+                    // Fallback on earlier versions
+                    if #available(iOS 11.3, *) {
+                        SKAdNetwork.registerAppForAdNetworkAttribution()
+                        DYMobileSDK.shared.apiManager.reportConversionValue(cv: 0)
+                    }
+                }
+            }
+        }
+    }
+    
 }
 
 extension DYMobileSDK: DYMAppDelegateSwizzlerDelegate {
@@ -358,6 +425,7 @@ extension DYMobileSDK: DYMAppDelegateSwizzlerDelegate {
         Self.apnsToken = deviceToken
         if let token = self.apnsTokenStr {
             Self.reportDeviceToken(token: token)
+            print("token - \(token)")
         }
     }
 }

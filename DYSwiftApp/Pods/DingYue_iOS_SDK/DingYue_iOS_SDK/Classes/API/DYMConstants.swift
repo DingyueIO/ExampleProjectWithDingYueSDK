@@ -15,10 +15,6 @@ class DYMConstants: NSObject {
         static var secretKey = ""
         static var appId = ""
     }
-    ///网络链接
-    enum URLs {
-        static let host = "mobile.dingyueio.com"
-    }
     
     ///请求头
     enum Headers {
@@ -29,7 +25,7 @@ class DYMConstants: NSObject {
     }
 
     enum Versions {
-        static let SDKVersion = "0.3.2"
+        static let SDKVersion = "0.3.5"
         static let SDKBuild = 1
     }
     enum BundleKeys {
@@ -57,6 +53,7 @@ class DYMConstants: NSObject {
         static let responseJSONCaches        = "DYMSDK_Response_JSON_Caches"
         static let postRequestParamsHashes   = "DYMSDK_Post_Request_Params_Hashes"
         static let cachedPayWallPageIdentifier      = "DYMSDK_Cached_PayWall_Page_Identifier"
+        static let multipleLaunch            = "DYMSDK_is_Multiple_Launch"
     }
     ///App信息plist文件
     enum AppInfoName {

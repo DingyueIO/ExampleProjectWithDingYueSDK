@@ -218,11 +218,22 @@ class DYMDefaultsManager {
         }
         return subsArray
     }
+    
+    var isMultipleLaunch: Bool {
+        get {
+            return (defaults.bool(forKey: DYMConstants.UserDefaults.multipleLaunch))
+        }
+        
+        set {
+            defaults.setValue(newValue, forKey: DYMConstants.UserDefaults.multipleLaunch)
+        }
+    }
 
     var isLoadingStatus: Bool = false
     var isUseNativePaywall: Bool = false
     var nativePaywallPath: String!
     var nativePaywallBasePath: String!
+    var defaultPaywallPath:String?
 
     func subscribedObjects(subscribedObjectArray: [SubscribedObject?]?) -> [[String:Any]] {
         var subsArray:[[String:Any]] = []

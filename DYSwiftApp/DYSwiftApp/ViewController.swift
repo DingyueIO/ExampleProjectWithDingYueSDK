@@ -22,19 +22,15 @@ class ViewController: UIViewController{
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
+        self.view.backgroundColor = .white
         self.view.addSubview(purchaseBtn)
     }
 
     @objc func goPurchase(){
-        //自定义内购项
-        let product = Subscription(type: "CONSUMABLE", name: "消耗品2", platformProductId: "com.dingyue.consumable2", price: "12.99", currencyCode: "USD",countryCode: "USD")
-        let product2 = Subscription(type: "CONSUMABLE", name: "hello test", platformProductId: "com.dingyue.consumable1", appleSubscriptionGroupId: "", description: "消耗", period: "MONTH", price: "34.0", currencyCode: "USD", countryCode: "USD", priceTier: [], gracePeriod: true, icon: "", renewPriceChange: true)
-
-        /*
-         *
-         */
-        //显示sdk内购页
-        DYMobileSDK.showVisualPaywall(products: [product,product2], rootController: self) { receipt, purchaseResult, error in
+        let product1 = Subscription(type: "SUBSCRIPTION", name: "Week", platformProductId: "testWeek", price: "12.99", currencyCode: "USD", countryCode: "USD")
+        let product2 = Subscription(type: "SUBSCRIPTION", name: "MONTH", platformProductId: "testMonth", price: "34.99", currencyCode: "USD", countryCode: "USD")
+        
+        DYMobileSDK.showVisualPaywall(products: [product1,product2], rootController: self) { receipt, purchaseResult, error in
             if error == nil {
                 print("(DingYueSDK): 购买成功！")
             }
@@ -45,17 +41,19 @@ extension ViewController:DYMPayWallActionDelegate {
     public func clickTermsAction(baseViewController: UIViewController) {
         //do some customed thing
         let vc = LBWebViewController.init()
-        vc.url = "https://www.caretiveapp.com/tou/1549634329/"
-        vc.title = NSLocalizedString("Terms_of_Service", comment: "")
+        vc.url = "https://www.caretiveapp.com/tou/XXXXXXX/"
+        vc.title = "Terms_of_Service"
         let nav = UINavigationController.init(rootViewController: vc)
+        nav.modalPresentationStyle = .fullScreen
         baseViewController.present(nav, animated: true)
     }
 
     public func clickPrivacyAction(baseViewController: UIViewController) {
         let vc = LBWebViewController.init()
-        vc.url = "https://www.caretiveapp.com/pp/1549634329/"
-        vc.title = NSLocalizedString("Privacy_Policy", comment: "")
+        vc.url = "https://www.caretiveapp.com/pp/XXXXXXX/"
+        vc.title = "Privacy_Policy"
         let nav = UINavigationController.init(rootViewController: vc)
+        nav.modalPresentationStyle = .fullScreen
         baseViewController.present(nav, animated: true)
     }
 

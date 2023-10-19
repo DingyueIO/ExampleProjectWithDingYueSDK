@@ -4,5 +4,5 @@ use_frameworks!
 platform :ios, '11.0'
 
 target 'DYSwiftApp' do
-  pod 'DingYue_iOS_SDK'
+  pod 'DingYue_iOS_SDK', :git => 'https://github.com/DingyueIO/DingYue_iOS_SDK.git' , :tag => '0.3.7'
 end

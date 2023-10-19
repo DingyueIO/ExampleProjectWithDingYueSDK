@@ -11,39 +11,21 @@
 
 @interface ViewController ()<DYMPayWallActionDelegate>
 @property (weak, nonatomic) IBOutlet UIButton *goPurchaseButton;
-
 @end
 
 @implementation ViewController
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    self.view.backgroundColor = UIColor.whiteColor;
 }
 - (IBAction)goPurchaseAction:(id)sender {
-    [DYMobileSDK trackWithEvent:@"" extra:nil user:nil];
-
-
-
-    [DYMobileSDK validateReceiptRecover:@"" completion:^(NSDictionary<NSString *,id> * result, NSError * error) {
-        if (error == nil) {
-            //购买成功
-        }
-    }];
-
-//    [DYMobileSDK validateReceiptFirst:@"" for:skproduct completion:^(NSDictionary<NSString *,id> * result, NSError * error) {
-//        if (error == nil) {
-//            //购买成功
-//        }
-//    }];
-
-
+    [DYMobileSDK trackWithEvent:@"evenName" extra:nil user:nil];
 
     //使用DingYue内购页
     Subscription *defaultProduct = [[Subscription alloc] initWithType:@"SUBSCRIPTION" name:@"WEEK" platformProductId:@"testWeek" subscriptionDescription:@"test" period:@"week" price:@"7.99" currencyCode:@"USD" countryCode:@"US"];
-    [DYMobileSDK showVisualPaywallWithProducts:@[defaultProduct] rootController:self completion:^(NSString * receipt, NSArray<NSDictionary<NSString *,id> *> * purchasedInfo, DYMError * error) {
-        if (error == nil) {
-            //购买成功
-        }
+    [DYMobileSDK showVisualPaywallWithProducts:@[defaultProduct] rootController:self extras:@{} completion:^(NSString * receipt, NSArray<NSDictionary<NSString *,id> *> * purchasedInfo, DYMError * error) {
+            
     }];
 }
 
@@ -51,14 +33,14 @@
 //实现隐私政策和使用协议action
 -(void)clickTermsActionWithBaseViewController:(UIViewController *)baseViewController {
     PTWebViewController *vc = [[PTWebViewController alloc] init];
-    vc.url = @"https://www.caretiveapp.com/tou/1543367096/";
+    vc.url = @"https://www.caretiveapp.com/tou/XXXXX/";
     vc.title = @"Terms of Service";
     UINavigationController *nav = [[UINavigationController alloc] initWithRootViewController:vc];
     [baseViewController presentViewController:nav animated:YES completion:nil];
 }
 -(void)clickPrivacyActionWithBaseViewController:(UIViewController *)baseViewController {
     PTWebViewController *vc = [[PTWebViewController alloc] init];
-    vc.url = @"https://www.caretiveapp.com/pp/1543367096/";
+    vc.url = @"https://www.caretiveapp.com/pp/XXXXX/";
     vc.title = @"Privacy Policy";
     UINavigationController *nav = [[UINavigationController alloc] initWithRootViewController:vc];
     [baseViewController presentViewController:nav animated:YES completion:nil];

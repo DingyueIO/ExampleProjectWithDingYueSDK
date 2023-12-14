@@ -1451,6 +1451,7 @@
 			baseConfigurationReference = F6C1D2D08519649648F9824B9B29FBB4 /* DingYue_iOS_SDK.release.xcconfig */;
 			buildSettings = {
 				CONFIGURATION_BUILD_DIR = "$(BUILD_DIR)/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)/DingYue_iOS_SDK";
+				DEVELOPMENT_TEAM = 6758SSTNXL;
 				IBSC_MODULE = DingYue_iOS_SDK;
 				INFOPLIST_FILE = "Target Support Files/DingYue_iOS_SDK/ResourceBundle-DingYue_iOS_SDK-DingYue_iOS_SDK-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 11.0;

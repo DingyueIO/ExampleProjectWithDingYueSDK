@@ -36,6 +36,7 @@
 
 
             if (results) {
+                NSLog(@"%@", results);
                 //网页自定义开关
                 NSArray<SwitchItem *> *switchs = results[@"switchs"];
                 //购买过的有效产品

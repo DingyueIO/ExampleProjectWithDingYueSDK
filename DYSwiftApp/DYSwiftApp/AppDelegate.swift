@@ -18,7 +18,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Override point for customization after application launch.
         //DingYueSDK 激活
         DYMobileSDK.activate { results, error in
-
+            print(results)
         }
         return true
     }
